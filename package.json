@@ -1,0 +1,12 @@
+{
+  "name": "cryptfolio",
+  "version": "1.0.0",
+  "description": "Simple command line cryptocurrency portfolio tracker",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Eirik Reksten",
+  "license": "MIT",
+  "devDependencies": {}
+}
