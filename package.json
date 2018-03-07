@@ -1,5 +1,5 @@
 {
-  "name": "cryptfolio",
+  "name": "crypto_portfolio",
   "version": "1.0.0",
   "description": "Simple command line cryptocurrency portfolio tracker",
   "scripts": {

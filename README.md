@@ -1,4 +1,4 @@
-# Cryptfolio
+# Crypto Portfolio
 
 ## Building and running the app
 
