@@ -2,11 +2,22 @@
   "name": "cryptfolio",
   "version": "1.0.0",
   "description": "Simple command line cryptocurrency portfolio tracker",
-  "main": "index.js",
   "scripts": {
+    "start": "node dist/main.js",
+    "build": "rm -rfv dist/* && babel src -d dist",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Eirik Reksten",
   "license": "MIT",
-  "devDependencies": {}
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-polyfill": "^6.26.0",
+    "babel-preset-env": "^1.6.1"
+  },
+  "dependencies": {
+    "columnify": "^1.5.4",
+    "lodash": "^4.17.5",
+    "mongoose": "^5.0.9",
+    "request": "^2.83.0"
+  }
 }
