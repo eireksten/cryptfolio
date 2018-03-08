@@ -27,26 +27,48 @@ function displayPortfolio() {
 
               const mycoins = _.filter(data, (item) => !!_.find(holdings, {symbol: item.symbol}));
               const table = _.map(mycoins, (coin) => {
+                const coinHoldings = _.find(holdings, {symbol: coin.symbol});
                 const coindata = {};
                 coindata.rank = coin.rank;
                 coindata.symbol = coin.symbol;
                 coindata.name = coin.name;
-                coindata.holdings = _.find(holdings, {symbol: coin.symbol}).amount;
-                coindata.btc_value = coindata.holdings * coin.price_btc;
+                coindata.holdings = coinHoldings.amount.toFixed(4);
+                coindata.btc_price = Number.parseFloat(coin.price_btc).toFixed(8);
+                coindata.btc_value = (coinHoldings.amount * coindata.btc_price).toFixed(8);
+                coindata.eur_price = Number.parseFloat(coin.price_eur).toFixed(2);
+                coindata.eur_value = (coinHoldings.amount * coindata.eur_price).toFixed(2);
                 return coindata;
               });
 
               const sortedTable = _.orderBy(table, ['btc_value'], ['desc']);
-              const total_value = _.reduce(table, (acc, item) => acc + item.btc_value, 0);
+              const total_value = _.reduce(table, (acc, item) => acc + parseFloat(item.btc_value), 0);
               const btcPriceEur = btc.price_eur;
               const total_value_eur = btcPriceEur * total_value;
 
-              console.log(columnify(sortedTable));
+              console.log(columnify(sortedTable, {
+                config: {
+                  holdings: {
+                    align: 'right'
+                  },
+                  btc_price: {
+                    align: 'right'
+                  },
+                  btc_value: {
+                    align: 'right'
+                  },
+                  eur_price: {
+                    align: 'right'
+                  },
+                  eur_value: {
+                    align: 'right'
+                  }
+                }
+              }));
               console.log();
               console.log(columnify({
-                'Total BTC value:': total_value,
-                'Current BTC price:': btcPriceEur,
-                'Total EUR Value:': total_value_eur
+                'Total value in BTC:': total_value,
+                'Current BTC price in EUR:': btcPriceEur,
+                'Total value in EUR:': total_value_eur
               }, {
                 showHeaders: false
               }));
