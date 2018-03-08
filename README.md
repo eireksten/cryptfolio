@@ -27,7 +27,7 @@ When the app has started successfully, it will say that it has connected to Mong
 
 - ```exit``` or ```quit``` exits this app.
 - ```display``` displays your current portfolio data.
-- ```set <symbol> <amount>``` sets the amount of the coin <symbol> in your portfolio to <amount>.
-- ```add <symbol> <amount>``` adds <amount> of the coin <symbol> to your portfolio.
-- ```remove <symbol> <amount>``` removes <amount> of the coin <symbol> from your portfolio.
+- ```set <symbol> <amount>``` sets the amount of the coin ```<symbol>``` in your portfolio to ```<amount>```.
+- ```add <symbol> <amount>``` adds ```<amount>``` of the coin ```<symbol>``` to your portfolio.
+- ```remove <symbol> <amount>``` removes ```<amount>``` of the coin ```<symbol>``` from your portfolio.
 - ```help``` displays the available commands.
