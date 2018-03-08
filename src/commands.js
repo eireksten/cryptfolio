@@ -124,6 +124,7 @@ function removeCurrency(symbol, amount) {
         return reject('Trying to remove more than holding');
 
       holding.amount -= amount;
+      // TODO If amount is approx 0
       holding.save(function (err) {
         if (err)
           return reject(err);
