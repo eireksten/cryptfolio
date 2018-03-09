@@ -21,8 +21,9 @@ function displayPortfolio() {
         reject();
       } else {
         getPricingData()
-            .then(function (data) {
+            .then(function (response) {
 
+              const data = response.data;
               const btc = _.find(data, {symbol: 'BTC'});
 
               const mycoins = _.filter(data, (item) => !!_.find(holdings, {symbol: item.symbol}));

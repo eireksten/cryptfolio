@@ -17,9 +17,9 @@
     "mocha": "^5.0.4"
   },
   "dependencies": {
+    "axios": "^0.18.0",
     "columnify": "^1.5.4",
     "lodash": "^4.17.5",
-    "mongoose": "^5.0.9",
-    "request": "^2.83.0"
+    "mongoose": "^5.0.9"
   }
 }

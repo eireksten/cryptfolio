@@ -1,17 +1,3 @@
-import request from 'request';
+import axios from 'axios';
 
-export function getPricingData() {
-
-  return new Promise(function (resolve, reject) {
-    request('https://api.coinmarketcap.com/v1/ticker/?convert=EUR&limit=200', function (error, response, body) {
-
-      if (error) {
-        reject(error);
-      } else {
-        resolve(JSON.parse(body));
-      }
-
-    });
-  });
-
-}
+export const getPricingData = () => axios.get('https://api.coinmarketcap.com/v1/ticker/?convert=EUR&limit=200');
