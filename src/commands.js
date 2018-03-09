@@ -74,18 +74,16 @@ function displayPortfolio() {
 
 function setCurrency(symbol, amount) {
 
-  return Holding.findOne({symbol: symbol}).exec()
-      .then((holding) => {
-        if (!holding) {
-          return new Holding({
-            symbol: symbol,
-            amount: amount
-          });
-        }
-        holding.amount = amount;
-        return holding;
-      })
-      .then((holding) => holding.save());
+  return Holding.findOneAndUpdate(
+      { symbol: symbol },
+      { amount: amount },
+      {
+        upsert: true,
+        runValidators: true,
+        setDefaultsOnInsert: true
+      }
+  ).exec();
+
 }
 
 function addCurrency(symbol, amount) {
