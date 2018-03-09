@@ -1,19 +1,5 @@
 import mongoose from 'mongoose';
-
-const historyEntrySchema = mongoose.Schema({
-  price: {
-    type: Number,
-    required: true,
-    min: 0.00000001
-  },
-  timestamp: {
-    type: Number,
-    required: true,
-    min: 0
-  }
-});
-
-const HistoryEntry = mongoose.model('HistoryEntry', historyEntrySchema);
+import {historyEntrySchema} from './history_entry.js';
 
 const historySchema = mongoose.Schema({
   symbol: {
@@ -34,8 +20,8 @@ const historySchema = mongoose.Schema({
 const History = mongoose.model('History', historySchema);
 
 export {
-  HistoryEntry,
-  History
-}
+  History,
+  historySchema
+};
 
 export default History;

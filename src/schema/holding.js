@@ -77,4 +77,9 @@ holdingSchema.statics.removeCurrency = function (symbol, amount) {
 
 const Holding = mongoose.model('Holding', holdingSchema);
 
+export {
+  Holding,
+  holdingSchema
+};
+
 export default Holding;
