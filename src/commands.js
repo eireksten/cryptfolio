@@ -72,65 +72,6 @@ function displayPortfolio() {
       });
 }
 
-function setCurrency(symbol, amount) {
-
-  return Holding.findOneAndUpdate(
-      { symbol: symbol },
-      { amount: amount },
-      {
-        upsert: true,
-        runValidators: true,
-        setDefaultsOnInsert: true
-      }
-  ).exec();
-
-}
-
-function addCurrency(symbol, amount) {
-
-  return Holding.findOne({symbol: symbol}).exec()
-      .then((holding) => {
-        if (!holding) {
-          return new Holding({
-            symbol: symbol,
-            amount: amount
-          });
-        }
-        holding.amount += amount;
-        return holding;
-      })
-      .then((holding) => holding.save());
-
-}
-
-function deleteHolding(symbol) {
-  return Holding.findOne({symbol: symbol}).exec()
-      .then((holding) => {
-        if (!holding)return Promise.reject('Currently not holding this currency.');
-        return holding;
-      })
-      .then((holding) => holding.remove());
-}
-
-function removeCurrency(symbol, amount) {
-
-  return Holding.findOne({symbol: symbol}).exec()
-      .then((holding) => {
-        if (!holding)
-          return Promise.reject('Currently not holding this currency');
-
-        if (holding.amount < amount)
-          return Promise.reject('Trying to remove more than current amount');
-
-        holding.amount -= amount;
-        // TODO If amount is approx 0, delete?
-        return holding;
-
-      })
-      .then((holding) => holding.save());
-
-}
-
 function displayHelp() {
 
   console.log('The following commands are supported:');
@@ -155,14 +96,14 @@ export default function processCommand(input) {
   case Commands.DISPLAY:
     return displayPortfolio();
   case Commands.SET:
-    return setCurrency(args[1], Number.parseFloat(args[2]));
+    return Holding.setCurrency(args[1], Number.parseFloat(args[2]));
   case Commands.ADD:
-    return addCurrency(args[1], Number.parseFloat(args[2]));
+    return Holding.addCurrency(args[1], Number.parseFloat(args[2]));
   case Commands.REMOVE:
     if (args.length === 3) {
-      return removeCurrency(args[1], Number.parseFloat(args[2]));
+      return Holding.removeCurrency(args[1], Number.parseFloat(args[2]));
     } else if (args.length === 2) {
-      return deleteHolding(args[1]);
+      return Holding.deleteHolding(args[1]);
     }
     return Promise.reject('Wrong number of arguments.');
   case Commands.HELP:
