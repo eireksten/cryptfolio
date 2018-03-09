@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import columnify from 'columnify';
-import { getPricingData } from './price_api.js';
+import { getPricingData } from './thirdparty_api.js';
 import Holding from './schema/holding.js';
 
 export const Commands = {
@@ -15,73 +15,61 @@ export const Commands = {
 
 function displayPortfolio() {
 
-  return new Promise(function (resolve, reject) {
-    Holding.find(function (err, holdings) {
-      if (err) {
-        reject();
-      } else {
-        getPricingData()
-            .then(function (response) {
+  return Promise.all([Holding.find().exec(), getPricingData()])
+      .then((values) => {
+        const holdings = values[0];
+        const pricingdata = values[1].data;
 
-              const data = response.data;
-              const btc = _.find(data, {symbol: 'BTC'});
+        const btc = _.find(pricingdata, {symbol: 'BTC'});
+        const mycoins = _.filter(pricingdata, (item) => !!_.find(holdings, {symbol: item.symbol}));
 
-              const mycoins = _.filter(data, (item) => !!_.find(holdings, {symbol: item.symbol}));
-              const table = _.map(mycoins, (coin) => {
-                const coinHoldings = _.find(holdings, {symbol: coin.symbol});
-                const coindata = {};
-                coindata.rank = coin.rank;
-                coindata.symbol = coin.symbol;
-                coindata.name = coin.name;
-                coindata.holdings = coinHoldings.amount.toFixed(4);
-                coindata.btc_price = Number.parseFloat(coin.price_btc).toFixed(8);
-                coindata.btc_value = (coinHoldings.amount * coindata.btc_price).toFixed(8);
-                coindata.eur_price = Number.parseFloat(coin.price_eur).toFixed(2);
-                coindata.eur_value = (coinHoldings.amount * coindata.eur_price).toFixed(2);
-                return coindata;
-              });
+        const table = _.map(mycoins, (coin) => {
+          const coinHoldings = _.find(holdings, {symbol: coin.symbol});
+          const coindata = {};
+          coindata.rank = coin.rank;
+          coindata.symbol = coin.symbol;
+          coindata.name = coin.name;
+          coindata.holdings = coinHoldings.amount.toFixed(4);
+          coindata.btc_price = Number.parseFloat(coin.price_btc).toFixed(8);
+          coindata.btc_value = (coinHoldings.amount * coindata.btc_price).toFixed(8);
+          coindata.eur_price = Number.parseFloat(coin.price_eur).toFixed(2);
+          coindata.eur_value = (coinHoldings.amount * coindata.eur_price).toFixed(2);
+          return coindata;
+        });
 
-              const sortedTable = _.orderBy(table, ['btc_value'], ['desc']);
-              const total_value = _.reduce(table, (acc, item) => acc + parseFloat(item.btc_value), 0);
-              const btcPriceEur = btc.price_eur;
-              const total_value_eur = btcPriceEur * total_value;
+        const sortedTable = _.orderBy(table, ['btc_value'], ['desc']);
+        const total_value = _.reduce(table, (acc, item) => acc + parseFloat(item.btc_value), 0);
+        const btcPriceEur = btc.price_eur;
+        const total_value_eur = btcPriceEur * total_value;
 
-              console.log(columnify(sortedTable, {
-                config: {
-                  holdings: {
-                    align: 'right'
-                  },
-                  btc_price: {
-                    align: 'right'
-                  },
-                  btc_value: {
-                    align: 'right'
-                  },
-                  eur_price: {
-                    align: 'right'
-                  },
-                  eur_value: {
-                    align: 'right'
-                  }
-                }
-              }));
-              console.log();
-              console.log(columnify({
-                'Total value in BTC:': total_value,
-                'Current BTC price in EUR:': btcPriceEur,
-                'Total value in EUR:': total_value_eur
-              }, {
-                showHeaders: false
-              }));
-
-            })
-            .then(
-                resolve,
-                reject
-            );
-      }
-    });
-  });
+        console.log(columnify(sortedTable, {
+          config: {
+            holdings: {
+              align: 'right'
+            },
+            btc_price: {
+              align: 'right'
+            },
+            btc_value: {
+              align: 'right'
+            },
+            eur_price: {
+              align: 'right'
+            },
+            eur_value: {
+              align: 'right'
+            }
+          }
+        }));
+        console.log();
+        console.log(columnify({
+          'Total value in BTC:': total_value,
+          'Current BTC price in EUR:': btcPriceEur,
+          'Total value in EUR:': total_value_eur
+        }, {
+          showHeaders: false
+        }));
+      });
 }
 
 function setCurrency(symbol, amount) {
@@ -163,41 +151,26 @@ function displayHelp() {
 
 export default function processCommand(input) {
 
-  return new Promise(function (resolve, reject) {
+  const args = input.split(' ');
 
-    const args = input.split(' ');
-
-    switch(args[0]) {
-    case Commands.DISPLAY:
-      displayPortfolio()
-          .then(resolve, reject);
-      break;
-    case Commands.SET:
-      setCurrency(args[1], Number.parseFloat(args[2]))
-          .then(resolve, reject);
-      break;
-    case Commands.ADD:
-      addCurrency(args[1], Number.parseFloat(args[2]))
-          .then(resolve, reject);
-      break;
-    case Commands.REMOVE:
-        if (args.length === 3) {
-          removeCurrency(args[1], Number.parseFloat(args[2]))
-              .then(resolve, reject);
-        } else if (args.length === 2) {
-          deleteHolding(args[1]);
-        } else {
-
-        }
-      break;
-    case Commands.HELP:
-      displayHelp()
-          .then(resolve, reject);
-      break;
-    default:
-      reject();
+  switch(args[0]) {
+  case Commands.DISPLAY:
+    return displayPortfolio();
+  case Commands.SET:
+    return setCurrency(args[1], Number.parseFloat(args[2]));
+  case Commands.ADD:
+    return addCurrency(args[1], Number.parseFloat(args[2]));
+  case Commands.REMOVE:
+    if (args.length === 3) {
+      return removeCurrency(args[1], Number.parseFloat(args[2]));
+    } else if (args.length === 2) {
+      return deleteHolding(args[1]);
     }
-
-  });
+    return Promise.reject('Wrong number of arguments.');
+  case Commands.HELP:
+    return displayHelp();
+  default:
+    return Promise.reject();
+  }
 
 }
