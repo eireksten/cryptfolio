@@ -84,98 +84,78 @@ function displayPortfolio() {
   });
 }
 
+function setCurrency(symbol, amount) {
+
+  return Holding.findOne({symbol: symbol}).exec()
+      .then((holding) => {
+        if (!holding) {
+          return new Holding({
+            symbol: symbol,
+            amount: amount
+          });
+        }
+        holding.amount = amount;
+        return holding;
+      })
+      .then((holding) => holding.save());
+}
+
 function addCurrency(symbol, amount) {
-  return new Promise(function (resolve, reject) {
-    Holding.find({symbol: symbol}, function (err, holdings) {
-      if (err)return reject(err);
 
-      if (!holdings.length) {
-        const newHolding = new Holding({
-          symbol: symbol,
-          amount: amount
-        });
-        newHolding.save(function (err) {
-          if (err)return reject(err);
-          return resolve();
-        });
-      } else {
-        const holding = holdings[0];
+  return Holding.findOne({symbol: symbol}).exec()
+      .then((holding) => {
+        if (!holding) {
+          return new Holding({
+            symbol: symbol,
+            amount: amount
+          });
+        }
         holding.amount += amount;
-        holding.save(function (err) {
-          if (err)return reject(err);
-          return resolve();
-        });
-      }
+        return holding;
+      })
+      .then((holding) => holding.save());
 
-    });
-  });
+}
+
+function deleteHolding(symbol) {
+  return Holding.findOne({symbol: symbol}).exec()
+      .then((holding) => {
+        if (!holding)return Promise.reject('Currently not holding this currency.');
+        return holding;
+      })
+      .then((holding) => holding.remove());
 }
 
 function removeCurrency(symbol, amount) {
-  return new Promise(function (resolve, reject) {
-    Holding.find({symbol: symbol}, function (err, holdings) {
-      if (err)
-        return reject(err);
 
-      if (!holdings.length)
-        return reject('Currently not holding this currency.');
+  return Holding.findOne({symbol: symbol}).exec()
+      .then((holding) => {
+        if (!holding)
+          return Promise.reject('Currently not holding this currency');
 
-      const holding = holdings[0];
-      if (holding.amount < amount)
-        return reject('Trying to remove more than holding');
+        if (holding.amount < amount)
+          return Promise.reject('Trying to remove more than current amount');
 
-      holding.amount -= amount;
-      // TODO If amount is approx 0
-      holding.save(function (err) {
-        if (err)
-          return reject(err);
+        holding.amount -= amount;
+        // TODO If amount is approx 0, delete?
+        return holding;
 
-        return resolve();
-      });
+      })
+      .then((holding) => holding.save());
 
-
-    });
-  });
-}
-
-function setCurrency(symbol, amount) {
-  return new Promise(function (resolve, reject) {
-    Holding.find({symbol: symbol}, function (err, holdings) {
-      if (err)return reject(err);
-
-      if (!holdings.length) {
-        const newHolding = new Holding({
-          symbol: symbol,
-          amount: amount
-        });
-        newHolding.save(function (err) {
-          if (err)return reject(err);
-          return resolve();
-        });
-      } else {
-        const holding = holdings[0];
-        holding.amount = amount;
-        holding.save(function (err) {
-          if (err)return reject(err);
-          return resolve();
-        });
-      }
-
-    });
-  });
 }
 
 function displayHelp() {
 
   console.log('The following commands are supported:');
   console.log(columnify([
-    {command: Commands.ADD, description: '"Add <symbol> <amount>" adds <amount> of the coin <symbol> to your portfolio.'},
+    {command: Commands.ADD, description: '"add <symbol> <amount>" adds <amount> of the coin <symbol> to your portfolio.'},
     {command: Commands.DISPLAY, description: 'Displays your current portfolio data.'},
     {command: Commands.EXIT, description: 'Exits the app.'},
     {command: Commands.HELP, description: 'Displays this help.'},
     {command: Commands.QUIT, description: 'Exits the app.'},
-    {command: Commands.REMOVE, description: '"Add <symbol> <amount>" removes <amount> of the coin <symbol> from your portfolio.'},
-    {command: Commands.SET, description: '"Add <symbol> <amount>" sets the amount of the coin <symbol> in your portfolio to <amount>.'}
+    {command: Commands.REMOVE, description: '"remove <symbol> <amount>" removes <amount> of the coin <symbol> from your portfolio, while "remove <symbol>" removes the full amount and clears the holding.'},
+    {command: Commands.SET, description: '"set <symbol> <amount>" sets the amount of the coin <symbol> in your portfolio to <amount>.'}
   ]));
   return Promise.resolve();
 
@@ -201,8 +181,14 @@ export default function processCommand(input) {
           .then(resolve, reject);
       break;
     case Commands.REMOVE:
-      removeCurrency(args[1], Number.parseFloat(args[2]))
-          .then(resolve, reject);
+        if (args.length === 3) {
+          removeCurrency(args[1], Number.parseFloat(args[2]))
+              .then(resolve, reject);
+        } else if (args.length === 2) {
+          deleteHolding(args[1]);
+        } else {
+
+        }
       break;
     case Commands.HELP:
       displayHelp()
