@@ -3,6 +3,7 @@ import _ from 'lodash';
 
 import * as DB from './db.js';
 import processCommand, { Commands } from './commands.js';
+import MarketPoller from './marketpoller';
 
 // ### CLI
 const rl = readline.createInterface({
@@ -41,3 +42,6 @@ process.on('beforeExit', (code) => {
   DB.disconnect();
   console.log(`Exiting with code ${code}...`);
 });
+
+// ### Polling the market
+MarketPoller.start();

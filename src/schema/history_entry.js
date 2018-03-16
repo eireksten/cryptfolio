@@ -10,6 +10,10 @@ const historyEntrySchema = mongoose.Schema({
     type: Number,
     required: true,
     min: 0
+  },
+  persist: {
+    type: Boolean,
+    default: false
   }
 });
 

@@ -18,8 +18,11 @@
   },
   "dependencies": {
     "axios": "^0.18.0",
+    "beepbeep": "^1.2.1",
+    "colors": "^1.1.2",
     "columnify": "^1.5.4",
     "lodash": "^4.17.5",
+    "moment": "^2.21.0",
     "mongoose": "^5.0.9"
   }
 }

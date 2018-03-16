@@ -9,6 +9,11 @@ const holdingSchema = mongoose.Schema({
     uppercase: true,
     trim: true
   },
+  name: {
+    type: String,
+    default: '',
+    trim: true
+  },
   amount: {
     type: Number,
     default: 0,
@@ -18,7 +23,7 @@ const holdingSchema = mongoose.Schema({
 
 holdingSchema.statics.setCurrency = function (symbol, amount) {
 
-  return this.findOneAndUpdate(
+  return this.update(
       { symbol: symbol },
       { amount: amount },
       {
@@ -28,6 +33,18 @@ holdingSchema.statics.setCurrency = function (symbol, amount) {
       }
   ).exec();
 
+};
+
+holdingSchema.statics.setName = function (symbol, name) {
+  return this.update(
+      {symbol: symbol},
+      {name: name},
+      {
+        upsert: true,
+        runValidators: true,
+        setDefaultsOnInsert: true
+      }
+  ).exec();
 };
 
 holdingSchema.statics.addCurrency = function (symbol, amount) {

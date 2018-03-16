@@ -39,4 +39,16 @@ describe('Holding', function() {
     });
 
   });
+
+  describe('#defaults', function () {
+
+    it('should default amount to zero', function () {
+      const holding = new Holding({
+        symbol: 'BTC'
+      });
+      expect(holding.amount).to.be.equal(0);
+    });
+
+  });
+
 });
